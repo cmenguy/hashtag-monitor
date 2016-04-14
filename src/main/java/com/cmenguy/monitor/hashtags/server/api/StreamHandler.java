@@ -1,6 +1,13 @@
 package com.cmenguy.monitor.hashtags.server.api;
 
 import com.cmenguy.monitor.hashtags.common.Twitter.Tweet;
+import com.cmenguy.monitor.hashtags.server.core.BusManager;
+import com.google.common.collect.EvictingQueue;
+import com.google.common.collect.Queues;
+import org.apache.commons.collections.Buffer;
+import org.apache.commons.collections.BufferUtils;
+import org.apache.commons.collections.buffer.BoundedFifoBuffer;
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -15,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
+import java.util.Queue;
 import java.util.zip.GZIPInputStream;
 
 public class StreamHandler extends AbstractHandler {
@@ -44,18 +52,14 @@ public class StreamHandler extends AbstractHandler {
             Request baseRequest,
             HttpServletRequest request,
             HttpServletResponse response) throws IOException, ServletException {
-        response.setStatus(onSuccessCode);
-
         String hashtag = request.getParameter(requestParamKey);
-        //String hashtag = "foo";
         byte[] payload = getPayload(request);
-        Tweet tweet = Tweet.parseFrom(payload);
-        logger.info("hashtag: " + hashtag + ", tweet: '" + tweet.getText() + "'");
+        //Tweet tweet = Tweet.parseFrom(payload);
+        //logger.info("hashtag: " + hashtag + ", tweet: '" + tweet.getText() + "', id: '" + snowflakeId + "'");
 
-        //PrintWriter out = response.getWriter();
+        BusManager.INSTANCE.post(hashtag, payload);
 
-        //out.println("<h1>" + foo + "</h1>");
-
+        response.setStatus(onSuccessCode);
         baseRequest.setHandled(true);
     }
 }

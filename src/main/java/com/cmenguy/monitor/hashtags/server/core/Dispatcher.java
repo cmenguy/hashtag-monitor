@@ -6,6 +6,7 @@ import com.cmenguy.monitor.hashtags.common.Twitter.Tweet;
 import com.cmenguy.monitor.hashtags.server.api.SafeHttpClient;
 import com.cmenguy.monitor.hashtags.server.stream.ITweetStream;
 import com.google.common.base.Function;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPOutputStream;
@@ -95,14 +97,19 @@ public class Dispatcher implements Runnable {
                             public String apply(Hashtag ht) { return ht.getText(); }
                         };
 
-                List<String> hashtags = Lists.transform(tweet.getEntities().getHashtagsList(), hashtagToName);
+                // if a tweet has the same hashtag multiple times, we only need to process it once so use a set
+                Set<String> hashtags = FluentIterable
+                        .from(tweet.getEntities().getHashtagsList())
+                        .transform(hashtagToName)
+                        .toSet();
+
                 for (String hashtag : hashtags) {
                     try {
                         int bucket = computeBucket(hashtag);
                         String fullHost = ring.get(bucket);
                         dispatch(payload, hashtag, fullHost);
                     } catch (Exception e) {
-                        logger.error("error while dispatching tweet for hashtah " + hashtag, e);
+                        logger.error("error while dispatching tweet for hashtag " + hashtag, e);
                     }
                 }
             } catch (Exception e) {
