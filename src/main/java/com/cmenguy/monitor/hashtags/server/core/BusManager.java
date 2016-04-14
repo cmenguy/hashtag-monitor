@@ -1,5 +1,6 @@
 package com.cmenguy.monitor.hashtags.server.core;
 
+import com.cmenguy.monitor.hashtags.server.api.SafeHttpClient;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
@@ -17,6 +18,7 @@ public enum BusManager {
     INSTANCE;
 
     private Executor executor;
+    private SafeHttpClient client;
     // hashtag to bus
     private final ConcurrentHashMap<String, AsyncEventBus> topics = new ConcurrentHashMap<String, AsyncEventBus>();
     // endpoint to listener
@@ -31,6 +33,11 @@ public enum BusManager {
         return this;
     }
 
+    public BusManager withHttpClient(SafeHttpClient client) {
+        this.client = client;
+        return this;
+    }
+
     private AsyncEventBus getOrCreate(String topicName) {
         AsyncEventBus bus = new AsyncEventBus(executor);
         AsyncEventBus previous = topics.putIfAbsent(topicName, bus);
@@ -38,16 +45,9 @@ public enum BusManager {
     }
 
     private EventListener getOrCreateListener(String endpoint) {
-        EventListener subscriber = new EventListener(endpoint);
+        EventListener subscriber = new EventListener(endpoint, client);
         EventListener previous = subscribers.putIfAbsent(endpoint, subscriber);
         return null == previous ? subscriber : previous;
-    }
-
-    private void addSubscription(String endpoint, String topicName) {
-        if (!subscriptions.containsKey(endpoint)) {
-            subscriptions.put(endpoint, new HashSet<String>());
-        }
-        subscriptions.get(endpoint).add(topicName);
     }
 
     public void post(String topicName, byte[] payload) {
