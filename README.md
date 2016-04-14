@@ -1,4 +1,5 @@
 # Background
+[![Build Status](https://travis-ci.org/cmenguy/hashtag-monitor.svg?branch=master)](https://travis-ci.org/cmenguy/hashtag-monitor.svg?branch=master)
 
 This project is a distributed system used to keep tweet objects in memory broken down by hashtag.
 It also allows clients to subscribe to a particular set of hashtags and will deliver the objects to any
