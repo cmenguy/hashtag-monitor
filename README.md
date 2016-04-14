@@ -33,11 +33,11 @@ The master is responsible for the following:
 * Transform each tweet into a protobuf object.
 * Store the objects into an internal queue.
 * Have a set of threads consuming from that queue, and for each object:
-** Transform each object into  protobuf-serialized byte array.
-** For each object, get the list of hashtags.
-** For each hashtag, hash it and do a `hash % numberOfSlaves` to figure out to which slave this tweet should be sent.
-** In case a tweet has multiple hashtags, it is possible to have the same tweet object sent to multiple slaves.
-** Send the data to the appropriate slave via a HTTP POST request, whose body contains the serialized protobuf object,
+    * Transform each object into  protobuf-serialized byte array.
+    * For each object, get the list of hashtags.
+    * For each hashtag, hash it and do a `hash % numberOfSlaves` to figure out to which slave this tweet should be sent.
+    * In case a tweet has multiple hashtags, it is possible to have the same tweet object sent to multiple slaves.
+    * Send the data to the appropriate slave via a HTTP POST request, whose body contains the serialized protobuf object,
 and as request parameter the hashtag.
 
 A quick note on data distribution: in the interest of time, for the current approach I have used a statically defined
