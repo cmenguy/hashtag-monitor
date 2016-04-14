@@ -1,35 +1,24 @@
 package com.cmenguy.monitor.hashtags.server.api;
 
 import com.cmenguy.monitor.hashtags.common.Constants;
-import com.cmenguy.monitor.hashtags.common.Twitter;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
 
+/**
+ * A wrapper around the HttpClient to provide standardized functionality and also use a custom connection manager.
+ */
 public class SafeHttpClient {
     private final CloseableHttpClient client;
     private final int maxRetries;
@@ -37,12 +26,13 @@ public class SafeHttpClient {
     private final static Logger logger = LoggerFactory.getLogger(SafeHttpClient.class);
 
     public SafeHttpClient(int maxTotal, int maxPerRoute, int maxRetries) {
+        // since it is shared across multiple threads, need to use a pool
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setMaxTotal(maxTotal);
         cm.setDefaultMaxPerRoute(maxPerRoute);
         this.client = HttpClients.custom()
                 .setConnectionManager(cm)
-                .setRedirectStrategy(new LaxRedirectStrategy())
+                .setRedirectStrategy(new LaxRedirectStrategy()) // redirect in case trailing / is missing
                 .build();
         this.maxRetries = maxRetries;
     }
@@ -54,7 +44,7 @@ public class SafeHttpClient {
             try {
                 HttpResponse response = client.execute(request, context);
                 int statusCode = response.getStatusLine().getStatusCode();
-                success = statusCode == expectedCode;
+                success = statusCode == expectedCode; // only exit if status code is 200
             } catch (Exception e) {
                 logger.error("error sending HTTP request to url " + url, e);
             }
@@ -65,6 +55,7 @@ public class SafeHttpClient {
         }
     }
 
+    // create a string out of the request params
     private String formatRequestParams(Map<String, String> requestParams) {
         return "?" + Joiner.on("&").withKeyValueSeparator("=").join(requestParams);
     }

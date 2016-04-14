@@ -127,3 +127,6 @@ hashtag at some point, where all the traffic would end up going to the same node
 data to the relevant node, it could also send it to the next N-1 nodes as defined in the topology array.
 * Everything is in memory, but it would be interesting to have things spill to disk if memory gets full instead of
 using a FIFO approach for evicting data.
+* Right now the master process doesn't accept registration/deregistration/modify requests from client, but it should. 
+When it received a client request, it should look at the hash of the hashtags and redirect these requests to the 
+appropriate slave nodes.

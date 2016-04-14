@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Called whenever we get a modify request.
+ */
 public class ModifyHandler extends AbstractHandler {
 
     private final int onSuccessCode;
@@ -36,6 +39,7 @@ public class ModifyHandler extends AbstractHandler {
                 .split(request.getParameter(hashtagsKey));
         String endpoint = request.getParameter(endpointKey);
 
+        // modify the list of hashtags subscribed to for that endpoint in the event bus
         BusManager.INSTANCE.modify(hashtags, endpoint);
 
         response.setStatus(onSuccessCode);

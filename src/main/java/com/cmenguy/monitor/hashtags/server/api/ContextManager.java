@@ -8,6 +8,9 @@ import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A class representing the whole context of this HTTP server.
+ */
 public class ContextManager implements IStreamable, ISubscribable {
 
     public ContextHandlerCollection setup(Config config) {
@@ -17,6 +20,7 @@ public class ContextManager implements IStreamable, ISubscribable {
         handlers.add(handleRegister(config));
         handlers.add(handleDeregister(config));
         handlers.add(handleModify(config));
+        // use a list of handlers instead of just one
         contexts.setHandlers(handlers.toArray(new Handler[handlers.size()]));
         return contexts;
     }

@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * A running thread used to monitor the distribution of our data in the cluster.
+ */
 public class DispatchMonitor implements Runnable {
     private final Map<String, AtomicLong> counters;
     private final long monitorFreqMillis;

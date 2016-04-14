@@ -11,6 +11,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 
+/**
+ * A producer process which will read streaming data from the master and allow clients to subscribe to feeds.
+ */
 public class HashTagProducer {
     private final static Logger logger = LoggerFactory.getLogger(HashTagProducer.class);
 
@@ -27,6 +30,8 @@ public class HashTagProducer {
             ExecutorService executorService =  new ThreadPoolExecutor(numWorkers, numWorkers,
                     0, TimeUnit.MILLISECONDS, blockingQueue, rejectedExecutionHandler);
             SafeHttpClient httpClient = new SafeHttpClient(numWorkers, numWorkers, maxRetries);
+
+            // need to make sure we initialize it with our executor service
             BusManager.INSTANCE
                     .withExecutor(executorService)
                     .withHttpClient(httpClient);
@@ -34,6 +39,7 @@ public class HashTagProducer {
             ContextManager manager = new ContextManager();
             server.setHandler(manager.setup(config));
 
+            // start the HTTP server and wait forever
             server.start();
             server.join();
         } catch (Exception e) {

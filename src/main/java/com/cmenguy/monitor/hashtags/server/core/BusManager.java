@@ -3,17 +3,17 @@ package com.cmenguy.monitor.hashtags.server.core;
 import com.cmenguy.monitor.hashtags.server.api.SafeHttpClient;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.AsyncEventBus;
-import com.google.common.eventbus.EventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
+/**
+ * Generic singleton used to interact between the clients and our stream of data.
+ */
 public enum BusManager {
     INSTANCE;
 

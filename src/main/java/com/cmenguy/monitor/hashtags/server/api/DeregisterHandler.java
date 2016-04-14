@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Called when we receive a request for deregistration.
+ */
 public class DeregisterHandler extends AbstractHandler {
 
     private final int onSuccessCode;
@@ -36,6 +39,7 @@ public class DeregisterHandler extends AbstractHandler {
                 .split(request.getParameter(hashtagsKey));
         String endpoint = request.getParameter(endpointKey);
 
+        // remove this endpoint for these hashtags
         BusManager.INSTANCE.deregister(hashtags, endpoint);
 
         response.setStatus(onSuccessCode);

@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Called when we get a register event.
+ */
 public class RegisterHandler extends AbstractHandler {
 
     private final int onSuccessCode;
@@ -36,6 +39,7 @@ public class RegisterHandler extends AbstractHandler {
                 .split(request.getParameter(hashtagsKey));
         String endpoint = request.getParameter(endpointKey);
 
+        // register this endpoint to a bug corresponding to this hashtag
         BusManager.INSTANCE.register(hashtags, endpoint);
 
         response.setStatus(onSuccessCode);

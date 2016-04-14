@@ -1,13 +1,6 @@
 package com.cmenguy.monitor.hashtags.server.api;
 
-import com.cmenguy.monitor.hashtags.common.Twitter.Tweet;
 import com.cmenguy.monitor.hashtags.server.core.BusManager;
-import com.google.common.collect.EvictingQueue;
-import com.google.common.collect.Queues;
-import org.apache.commons.collections.Buffer;
-import org.apache.commons.collections.BufferUtils;
-import org.apache.commons.collections.buffer.BoundedFifoBuffer;
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -17,14 +10,12 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Enumeration;
-import java.util.Queue;
 import java.util.zip.GZIPInputStream;
 
+/**
+ * Called whenever a slave receives incoming stream messages from the master.
+ */
 public class StreamHandler extends AbstractHandler {
     private final int onSuccessCode;
     private final boolean isGzipped;
@@ -53,10 +44,10 @@ public class StreamHandler extends AbstractHandler {
             HttpServletRequest request,
             HttpServletResponse response) throws IOException, ServletException {
         String hashtag = request.getParameter(requestParamKey);
-        byte[] payload = getPayload(request);
-        //Tweet tweet = Tweet.parseFrom(payload);
-        //logger.info("hashtag: " + hashtag + ", tweet: '" + tweet.getText() + "', id: '" + snowflakeId + "'");
+        byte[] payload = getPayload(request); // we get the protobuf-serialized object out
 
+        // we post our payload to the event bus of that particular hashtag
+        // anyone who had registered for that particular bus will receive it
         BusManager.INSTANCE.post(hashtag, payload);
 
         response.setStatus(onSuccessCode);

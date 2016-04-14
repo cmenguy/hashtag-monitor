@@ -5,8 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Some helper functions related to JSON manipulation.
+ */
 public class JsonUtils {
 
+    // traverse a map and remove anything that is empty (otherwise refused by protobuf)
     public static void removeEmptyLists(Map<String, Object> map) {
         for (Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();) {
             Map.Entry<String, Object> entry = it.next();
@@ -28,11 +32,8 @@ public class JsonUtils {
                         it.remove();
                     }
                 }
-            } else {
-                //System.out.println(entry.getKey()  + "->" + entry.getValue().getClass().getName());
             }
         }
-
     }
 
 }
